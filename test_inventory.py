@@ -166,6 +166,31 @@ def test_list_products_count_is_correct():
 
 # TODO: Write your Part B tests here
 
+def test_add_product_empty_id_raises_error():
+    with pytest.raises(ValueError, match="Product name cannot be empty"):
+        add_product("", 10.00, 5)
+        
+def test_add_product_negative_price_raises_error():
+    with pytest.raises(ValueError, match="Product price cannot be negative"):
+        add_product("Monitor", -10.00, 5)
+
+def test_add_product_duplicate_name_raises_error():
+    add_product("Cumpter", 20.00, 10)
+    with pytest.raises(ValueError, match="already exists"):
+        add_product("Cumpter", 25.00, 15)
+
+def test_update_stock_below_zero_raises_error():
+    product_id = add_product("Mouse", 10.00, 5)
+    with pytest.raises(ValueError, match="Stock cannot go below zero"):
+        update_stock(product_id, -6)
+
+def test_calculate_total_product_not_found_raises_error():
+    with pytest.raises(ValueError, match="Product not found"):
+        calculate_total("DOESNOTEXIST", 2)
+
+def test_get_product_not_found_returns_none():  
+    result = get_product("DOESNOTEXIST") 
+    assert result is None
 
 # ============================================================
 # PART C - Fixtures and Parametrize (10 marks)
