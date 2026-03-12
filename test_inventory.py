@@ -38,227 +38,185 @@ def clean_inventory(tmp_path, monkeypatch):
 
 # ============================================================
 # PART A - Basic Assertions (18 marks)
-# Write at least 8 tests using plain assert statements.
-# Cover: add_product, get_product, update_stock,
-#        calculate_total, and list_products.
-# Follow the AAA pattern (Arrange, Act, Assert).
 # ============================================================
 
-# TODO: Write your Part A tests here
 def test_add_product_fields_are_correct():
     # Arrange
     name = "Computer"
     price = 500.00
     stock = 20
-
     # Act
-    product_id = add_product(name, price, stock)
-    product = get_product(product_id)
-
+    result = add_product("A1", name, price, stock)
     # Assert
-    assert product["name"] == name
-    assert product["price"] == price
-    assert product["stock"] == stock
+    assert result["product_id"] == "A1"
+    assert result["name"] == name
+    assert result["price"] == price
+    assert result["stock"] == stock
 
 def test_add_product_with_zero_stock():
-    # Arrange
-    name = "Headphones"
-    price = 30.00
-    stock = 0
-
-    # Act
-    product_id = add_product(name, price, stock)
-    product = get_product(product_id)
-
+    # Arrange + Act
+    result = add_product("A2", "Headphones", 30.00, 0)
     # Assert
-    assert product["name"] == name
-    assert product["price"] == price
-    assert product["stock"] == stock
+    assert result["stock"] == 0
 
 def test_get_product_after_adding_it():
     # Arrange
-    name = "Mouse"
-    price = 25.00
-    stock = 15
-
+    add_product("A1", "Mouse", 25.00, 15)
     # Act
-    product_id = add_product(name, price, stock)
-    product = get_product(product_id)
-
+    result = get_product("A1")
     # Assert
-    assert product["name"] == name
-    assert product["price"] == price
-    assert product["stock"] == stock
+    assert result["name"] == "Mouse"
+    assert result["price"] == 25.00
+    assert result["stock"] == 15
 
 def test_update_stock_going_up():
     # Arrange
-    name = "Keyboard"
-    price = 15.50
-    stock = 10
-    product_id = add_product(name, price, stock)
-
+    add_product("A1", "Keyboard", 15.50, 10)
     # Act
-    update_stock(product_id, 5)
-    product = get_product(product_id)
-
+    update_stock("A1", 5)
+    product = get_product("A1")
     # Assert
-    assert product["stock"] == stock + 5
+    assert product["stock"] == 15
 
 def test_update_stock_going_down():
     # Arrange
-    name = "Monitor"
-    price = 150.00
-    stock = 8
-    product_id = add_product(name, price, stock)
-
+    add_product("A1", "Monitor", 150.00, 8)
     # Act
-    update_stock(product_id, -3)
-    product = get_product(product_id)
-
+    update_stock("A1", -3)
+    product = get_product("A1")
     # Assert
-    assert product["stock"] == stock - 3
+    assert product["stock"] == 5
 
 def test_calculate_total_multiplies_correctly():
     # Arrange
-    name = "Webcam"
-    price = 45.00
-    stock = 12
-    product_id = add_product(name, price, stock)
-    quantity = 4
-
+    add_product("A1", "Webcam", 45.00, 12)
     # Act
-    total = calculate_total(product_id, quantity)
-
+    total = calculate_total("A1", 4)
     # Assert
-    assert total == price * quantity
+    assert total == 180.00
 
 def test_get_product_returns_none_when_missing():
     # Act
-    result = get_product("DOESNOTEXIST") 
-
+    result = get_product("DOESNOTEXIST")
     # Assert
     assert result is None
 
 def test_list_products_when_empty():
     # Act
-    products = list_products()
-
+    result = list_products()
     # Assert
-    assert products == []
+    assert result == []
 
 def test_list_products_count_is_correct():
     # Arrange
-    add_product("Item A", 10.00, 5)
-    add_product("Item B", 20.00, 10)
-
+    add_product("A1", "Item A", 10.00, 5)
+    add_product("A2", "Item B", 20.00, 10)
     # Act
-    products = list_products()
-
+    result = list_products()
     # Assert
-    assert len(products) == 2
+    assert len(result) == 2
+
 
 # ============================================================
 # PART B - Exception Testing (12 marks)
-# Write at least 6 tests using pytest.raises.
-# Cover: empty name, negative price, duplicate product,
-#        stock going below zero, product not found, etc.
 # ============================================================
 
-# TODO: Write your Part B tests here
-
 def test_add_product_empty_id_raises_error():
-    with pytest.raises(ValueError, match="Product name cannot be empty"):
-        add_product("", 10.00, 5)
-        
-def test_add_product_negative_price_raises_error():
-    with pytest.raises(ValueError, match="Product price cannot be negative"):
-        add_product("Monitor", -10.00, 5)
+    with pytest.raises(ValueError, match="required"):
+        add_product("", "Laptop", 500.00, 10)
 
-def test_add_product_duplicate_name_raises_error():
-    add_product("Computer", 200.00, 10)
+def test_add_product_empty_name_raises_error():
+    with pytest.raises(ValueError, match="required"):
+        add_product("A1", "", 500.00, 10)
+
+def test_add_product_negative_price_raises_error():
+    with pytest.raises(ValueError, match="positive"):
+        add_product("A1", "Monitor", -10.00, 5)
+
+def test_add_product_duplicate_raises_error():
+    add_product("A1", "Computer", 200.00, 10)
     with pytest.raises(ValueError, match="already exists"):
-        add_product("Computer", 250.00, 15)
+        add_product("A1", "Computer", 250.00, 15)
 
 def test_update_stock_below_zero_raises_error():
-    product_id = add_product("Mouse", 10.00, 5)
-    with pytest.raises(ValueError, match="Stock cannot go below zero"):
-        update_stock(product_id, -6)
+    add_product("A1", "Mouse", 10.00, 5)
+    with pytest.raises(ValueError, match="zero"):
+        update_stock("A1", -6)
 
-def test_calculate_total_product_not_found_raises_error():
-    with pytest.raises(ValueError, match="Product not found"):
-        calculate_total("DOESNOTEXIST", 2)
+def test_calculate_total_zero_quantity_raises_error():
+    add_product("A1", "Laptop", 500.00, 10)
+    with pytest.raises(ValueError, match="positive"):
+        calculate_total("A1", 0)
 
-def test_get_product_not_found_returns_none():  
-    result = get_product("DOESNOTEXIST") 
-    assert result is None
 
 # ============================================================
 # PART C - Fixtures and Parametrize (10 marks)
-#
-# C1: Create a @pytest.fixture called "sample_products" that
-#     adds 3 products to the inventory and returns their IDs.
-#     Write 2 tests that use this fixture.
-#
-# C2: Use @pytest.mark.parametrize to test apply_bulk_discount
-#     with at least 5 different (total, quantity, expected) combos.
 # ============================================================
 
-# TODO: Write your Part C tests here
 @pytest.fixture
 def s_products():
-    product_ids = []
-    product_ids.append(add_product("Headphones", 50.00, 25))    
-    product_ids.append(add_product("Printer", 60.00, 30))
-    product_ids.append(add_product("Scanner", 70.00, 35))
-    return product_ids
+    add_product("A1", "Headphones", 50.00, 10)
+    add_product("A2", "Printer", 60.00, 50)
+    add_product("A3", "Scanner", 70.00, 25)
+    return ["A1", "A2", "A3"]
 
 def test_list_products_shows_three_items(s_products):
-    products = list_products()
-    assert len(products) == 3
+    result = list_products()
+    assert len(result) == 3
 
-def test_calculate_total_for_sample_products(s_products):
-    product_id = s_products[0] 
-    total = calculate_total(product_id, 2)
-    assert total == 100.00  
+def test_calculate_total_for_sample_product(s_products):
+    result = calculate_total("A1", 2)
+    assert result == 100.00
 
 @pytest.mark.parametrize("total, quantity, expected", [
-    (100.00, 2, 90.00),   # 10% discount
-    (200.00, 5, 160.00),  # 20% discount
-    (50.00, 1, 50.00),    # No discount
-    (300.00, 10, 240.00), # 50% discount
+    (100.00,  3, 100.00),
+    (100.00, 10,  95.00),
+    (100.00, 25,  90.00),
+    (100.00, 50,  85.00),
+    (200.00, 30, 180.00),
 ])
 def test_apply_bulk_discount(total, quantity, expected):
-    discounted_total = apply_bulk_discount(total, quantity)
-    assert discounted_total == expected
+    result = apply_bulk_discount(total, quantity)
+    assert result == expected
+
 
 # ============================================================
 # PART D - Mocking (5 marks)
-# Use @patch to mock _send_restock_alert.
-# Write 2 tests:
-#   1. Verify the alert IS called when stock drops below 5
-#   2. Verify the alert is NOT called when stock stays >= 5
 # ============================================================
 
-# TODO: Write your Part D tests here
+@patch("inventory._send_restock_alert")
+def test_restock_alert_called_when_stock_drops(mock_alert):
+    add_product("A1", "Webcam", 45.00, 6)
+    update_stock("A1", -3)
+    mock_alert.assert_called_once_with("A1", "Webcam", 3)
 
 @patch("inventory._send_restock_alert")
-def test_restock_alert_called_when_stock_below_threshold(mock_alert):
-    product_id = add_product("Webcam", 45.00, 6)
-    update_stock(product_id, -2)  
-    mock_alert.assert_called_once_with("Webcam")
-
-@patch("inventory._send_restock_alert")
-def test_restock_alert_not_called_when_stock_above_threshold(mock_alert):
-    product_id = add_product("Webcam", 45.00, 10)
-    update_stock(product_id, -4)  
+def test_restock_alert_not_called_when_stock_stays_high(mock_alert):
+    add_product("A1", "Webcam", 45.00, 20)
+    update_stock("A1", -5)
     mock_alert.assert_not_called()
+
 
 # ============================================================
 # PART E - Coverage (5 marks)
 # Run: pytest test_inventory.py --cov=inventory --cov-report=term-missing -v
-# You must achieve 90%+ coverage on inventory.py.
-# If lines are missed, add more tests above to cover them.
 # ============================================================
+
+def test_update_stock_product_not_found_raises_error():
+    with pytest.raises(ValueError, match="not found"):
+        update_stock("DOESNOTEXIST", 5)
+
+def test_add_product_negative_stock_raises_error():
+    with pytest.raises(ValueError, match="negative"):
+        add_product("A1", "Laptop", 500.00, -1)
+
+def test_apply_bulk_discount_negative_quantity_raises_error():
+    with pytest.raises(ValueError, match="negative"):
+        apply_bulk_discount(100.00, -1)
+
+def test_apply_bulk_discount_negative_total_raises_error():
+    with pytest.raises(ValueError, match="negative"):
+        apply_bulk_discount(-50.00, 5)
 
 
 # ============================================================
