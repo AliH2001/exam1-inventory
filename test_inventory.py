@@ -47,8 +47,8 @@ def clean_inventory(tmp_path, monkeypatch):
 # TODO: Write your Part A tests here
 def test_add_product_fields_are_correct():
     # Arrange
-    name = "Cumputer"
-    price = 50.00
+    name = "Computer"
+    price = 500.00
     stock = 20
 
     # Act
@@ -175,9 +175,9 @@ def test_add_product_negative_price_raises_error():
         add_product("Monitor", -10.00, 5)
 
 def test_add_product_duplicate_name_raises_error():
-    add_product("Cumpter", 20.00, 10)
+    add_product("Computer", 200.00, 10)
     with pytest.raises(ValueError, match="already exists"):
-        add_product("Cumpter", 25.00, 15)
+        add_product("Computer", 250.00, 15)
 
 def test_update_stock_below_zero_raises_error():
     product_id = add_product("Mouse", 10.00, 5)
@@ -241,6 +241,17 @@ def test_apply_bulk_discount(total, quantity, expected):
 
 # TODO: Write your Part D tests here
 
+@patch("inventory._send_restock_alert")
+def test_restock_alert_called_when_stock_below_threshold(mock_alert):
+    product_id = add_product("Webcam", 45.00, 6)
+    update_stock(product_id, -2)  
+    mock_alert.assert_called_once_with("Webcam")
+
+@patch("inventory._send_restock_alert")
+def test_restock_alert_not_called_when_stock_above_threshold(mock_alert):
+    product_id = add_product("Webcam", 45.00, 10)
+    update_stock(product_id, -4)  
+    mock_alert.assert_not_called()
 
 # ============================================================
 # PART E - Coverage (5 marks)
