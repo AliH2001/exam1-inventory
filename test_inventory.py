@@ -45,16 +45,6 @@ def clean_inventory(tmp_path, monkeypatch):
 # ============================================================
 
 # TODO: Write your Part A tests here
-
-
-# ============================================================
-# PART B - Exception Testing (12 marks)
-# Write at least 6 tests using pytest.raises.
-# Cover: empty name, negative price, duplicate product,
-#        stock going below zero, product not found, etc.
-# ============================================================
-
-# TODO: Write your Part B tests here
 def test_add_product_fields_are_correct():
     # Arrange
     name = "Cumputer"
@@ -166,6 +156,16 @@ def test_list_products_count_is_correct():
 
     # Assert
     assert len(products) == 2
+
+# ============================================================
+# PART B - Exception Testing (12 marks)
+# Write at least 6 tests using pytest.raises.
+# Cover: empty name, negative price, duplicate product,
+#        stock going below zero, product not found, etc.
+# ============================================================
+
+# TODO: Write your Part B tests here
+
 
 # ============================================================
 # PART C - Fixtures and Parametrize (10 marks)
