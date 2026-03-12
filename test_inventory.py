@@ -55,7 +55,117 @@ def clean_inventory(tmp_path, monkeypatch):
 # ============================================================
 
 # TODO: Write your Part B tests here
+def test_add_product_fields_are_correct():
+    # Arrange
+    name = "Cumputer"
+    price = 50.00
+    stock = 20
 
+    # Act
+    product_id = add_product(name, price, stock)
+    product = get_product(product_id)
+
+    # Assert
+    assert product["name"] == name
+    assert product["price"] == price
+    assert product["stock"] == stock
+
+def test_add_product_with_zero_stock():
+    # Arrange
+    name = "Headphones"
+    price = 30.00
+    stock = 0
+
+    # Act
+    product_id = add_product(name, price, stock)
+    product = get_product(product_id)
+
+    # Assert
+    assert product["name"] == name
+    assert product["price"] == price
+    assert product["stock"] == stock
+
+def test_get_product_after_adding_it():
+    # Arrange
+    name = "Mouse"
+    price = 25.00
+    stock = 15
+
+    # Act
+    product_id = add_product(name, price, stock)
+    product = get_product(product_id)
+
+    # Assert
+    assert product["name"] == name
+    assert product["price"] == price
+    assert product["stock"] == stock
+
+def test_update_stock_going_up():
+    # Arrange
+    name = "Keyboard"
+    price = 15.50
+    stock = 10
+    product_id = add_product(name, price, stock)
+
+    # Act
+    update_stock(product_id, 5)
+    product = get_product(product_id)
+
+    # Assert
+    assert product["stock"] == stock + 5
+
+def test_update_stock_going_down():
+    # Arrange
+    name = "Monitor"
+    price = 150.00
+    stock = 8
+    product_id = add_product(name, price, stock)
+
+    # Act
+    update_stock(product_id, -3)
+    product = get_product(product_id)
+
+    # Assert
+    assert product["stock"] == stock - 3
+
+def test_calculate_total_multiplies_correctly():
+    # Arrange
+    name = "Webcam"
+    price = 45.00
+    stock = 12
+    product_id = add_product(name, price, stock)
+    quantity = 4
+
+    # Act
+    total = calculate_total(product_id, quantity)
+
+    # Assert
+    assert total == price * quantity
+
+def test_get_product_returns_none_when_missing():
+    # Act
+    result = get_product("DOESNOTEXIST") 
+
+    # Assert
+    assert result is None
+
+def test_list_products_when_empty():
+    # Act
+    products = list_products()
+
+    # Assert
+    assert products == []
+
+def test_list_products_count_is_correct():
+    # Arrange
+    add_product("Item A", 10.00, 5)
+    add_product("Item B", 20.00, 10)
+
+    # Act
+    products = list_products()
+
+    # Assert
+    assert len(products) == 2
 
 # ============================================================
 # PART C - Fixtures and Parametrize (10 marks)
