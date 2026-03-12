@@ -204,7 +204,32 @@ def test_get_product_not_found_returns_none():
 # ============================================================
 
 # TODO: Write your Part C tests here
+@pytest.fixture
+def s_products():
+    product_ids = []
+    product_ids.append(add_product("Headphones", 50.00, 25))    
+    product_ids.append(add_product("Printer", 60.00, 30))
+    product_ids.append(add_product("Scanner", 70.00, 35))
+    return product_ids
 
+def test_list_products_shows_three_items(s_products):
+    products = list_products()
+    assert len(products) == 3
+
+def test_calculate_total_for_sample_products(s_products):
+    product_id = s_products[0] 
+    total = calculate_total(product_id, 2)
+    assert total == 100.00  
+
+@pytest.mark.parametrize("total, quantity, expected", [
+    (100.00, 2, 90.00),   # 10% discount
+    (200.00, 5, 160.00),  # 20% discount
+    (50.00, 1, 50.00),    # No discount
+    (300.00, 10, 240.00), # 50% discount
+])
+def test_apply_bulk_discount(total, quantity, expected):
+    discounted_total = apply_bulk_discount(total, quantity)
+    assert discounted_total == expected
 
 # ============================================================
 # PART D - Mocking (5 marks)
